@@ -9,11 +9,49 @@ namespace HumaneSociety
     public static class Query
     {
         public static void RunEmployeeQueries(Employee employee, string type)
-            //Console.WriteLine("Would you like to 1) update, 2) read, 3) delete or 4) create an employee?");
-
-        {//switch case
+        {
+            Console.Clear();
+            UserInterface.DisplayUserOptions("Would you like to 1) create, 2) read, 3) update or 4) delete an employee?");
+            string input = UserInterface.GetUserInput();
+            switch (input)
+            {
+                case "create":
+                    CreateEmployee();
+                    break;
+                case "read":
+                    ReadEmployee();
+                    break;
+                case "update":
+                    UpdateEmployee();
+                    break;
+                case "delete":
+                    DeleteEmployee();
+                    break;
+                default:
+                    UserInterface.DisplayUserOptions("Incorrect Input type please enter create, read, update or delete");
+                    RunEmployeeQueries(employee, type);
+                    break;
+            }
+        }
+        private static void CreateEmployee()
+        {
 
         }
+        private static void ReadEmployee()
+        {
+
+        }
+        private static void UpdateEmployee()
+        {
+
+        }
+ 
+        private static void DeleteEmployee()
+        {
+
+        }
+      
+
 
         public static Client GetClient(string userName, string password)
         {
@@ -28,7 +66,7 @@ namespace HumaneSociety
             return GetUserAdoptionStatus(client);
         }
 
-        public static List<Animal> GetAnimalByID(int ID)
+        public static Animal GetAnimalByID(int ID)
         {
             return GetAnimalByID(ID);
         }
