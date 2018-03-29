@@ -71,7 +71,11 @@ namespace HumaneSociety
         }
         public static List<ClientAnimalJunction> GetUserAdoptionStatus(Client client)
         {
-            return GetUserAdoptionStatus(client);
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var adoptionStatus = context.ClientAnimalJunctions.Where(r => r.client == client.ID).ToList();
+                return adoptionStatus;
+            }
         }
 
         public static Animal GetAnimalByID(int ID)
