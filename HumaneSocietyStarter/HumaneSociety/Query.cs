@@ -139,7 +139,7 @@ namespace HumaneSociety
         {
             using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
             {
-                Client clientToUpdate = context.Clients.Where(r => r.email == client.email).FirstOrDefault();
+                Client clientToUpdate = context.Clients.Where(r => r.ID == client.ID).FirstOrDefault();
                 clientToUpdate.email = client.email;
                 context.SubmitChanges();
             }
@@ -148,7 +148,7 @@ namespace HumaneSociety
         {
             using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
             {
-                Client clientToUpdate = context.Clients.Where(r => r.userAddress == client.userAddress).FirstOrDefault();
+                Client clientToUpdate = context.Clients.Where(r => r.ID == client.ID).FirstOrDefault();
                 clientToUpdate.userAddress = client.userAddress;
                 context.SubmitChanges();
             }
@@ -157,7 +157,7 @@ namespace HumaneSociety
         {
             using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
             {
-                Client clientToUpdate = context.Clients.Where(r => r.firstName == client.firstName).FirstOrDefault();
+                Client clientToUpdate = context.Clients.Where(r => r.ID == client.ID).FirstOrDefault();
                 clientToUpdate.firstName = client.firstName;
                 context.SubmitChanges();
             }
@@ -166,7 +166,7 @@ namespace HumaneSociety
         {
             using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
             {
-                Client clientToUpdate = context.Clients.Where(r => r.lastName == client.lastName).FirstOrDefault();
+                Client clientToUpdate = context.Clients.Where(r => r.ID == client.ID).FirstOrDefault();
                 clientToUpdate.lastName = client.lastName;
                 context.SubmitChanges();
             }
@@ -174,7 +174,10 @@ namespace HumaneSociety
 
         public static void UpdateAdoption(bool value, ClientAnimalJunction clientAnimalJunction)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+               
+            }
         }
 
         public static List<AnimalShotJunction> GetShots(Animal animal)
