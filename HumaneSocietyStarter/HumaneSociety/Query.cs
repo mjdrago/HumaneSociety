@@ -119,7 +119,7 @@ namespace HumaneSociety
 
         public static void AddNewClient(string firstName, string lastName, string userName, string password, string email, string streetAddress, int zipCode, int state)
         {
-            
+
         }
 
         public static void UpdateClient(Client client)
@@ -128,7 +128,12 @@ namespace HumaneSociety
         }
         public static void UpdateUsername(Client client)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                Client clientToUpdate = context.Clients.Where(r => r.ID == client.ID).FirstOrDefault();
+                clientToUpdate.userName = client.userName;
+                context.SubmitChanges();
+            }
         }
         public static void UpdateEmail(Client client)
         {
