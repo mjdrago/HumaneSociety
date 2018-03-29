@@ -137,19 +137,39 @@ namespace HumaneSociety
         }
         public static void UpdateEmail(Client client)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                Client clientToUpdate = context.Clients.Where(r => r.email == client.email).FirstOrDefault();
+                clientToUpdate.email = client.email;
+                context.SubmitChanges();
+            }
         }
         public static void UpdateAddress(Client client)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                Client clientToUpdate = context.Clients.Where(r => r.userAddress == client.userAddress).FirstOrDefault();
+                clientToUpdate.userAddress = client.userAddress;
+                context.SubmitChanges();
+            }
         }
         public static void UpdateFirstName(Client client)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                Client clientToUpdate = context.Clients.Where(r => r.firstName == client.firstName).FirstOrDefault();
+                clientToUpdate.firstName = client.firstName;
+                context.SubmitChanges();
+            }
         }
         public static void UpdateLastName(Client client)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                Client clientToUpdate = context.Clients.Where(r => r.lastName == client.lastName).FirstOrDefault();
+                clientToUpdate.lastName = client.lastName;
+                context.SubmitChanges();
+            }
         }
 
         public static void UpdateAdoption(bool value, ClientAnimalJunction clientAnimalJunction)
