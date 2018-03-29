@@ -55,11 +55,19 @@ namespace HumaneSociety
 
         public static Client GetClient(string userName, string password)
         {
-            return GetClient(userName, password);
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var client = context.Clients.Where(r => r.userName == userName && r.pass == password).ToList();
+                return client[0];
+            }
         }
-        public static List<ClientAnimalJunction> GetPendingAdoptions() //not sure about parameters needed? 
+        public static List<ClientAnimalJunction> GetPendingAdoptions()
         {
-            return GetPendingAdoptions();
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var pendingAdoptions = context.ClientAnimalJunctions.Where(r => r.approvalStatus == null).ToList();
+                return pendingAdoptions;
+            }
         }
         public static List<ClientAnimalJunction> GetUserAdoptionStatus(Client client)
         {
