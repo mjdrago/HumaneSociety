@@ -101,12 +101,20 @@ namespace HumaneSociety
 
         public static IQueryable<Client> RetrieveClients()
         {
-            return RetrieveClients();
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var allClients = context.Clients;
+                return allClients;
+            }
         }
 
         public static IQueryable<USState> GetStates()
         {
-            return GetStates();
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var allStates = context.USStates;
+                return allStates;
+            }
         }
 
         public static void AddNewClient(string firstName, string lastName, string userName, string password, string email, string streetAddress, int zipCode, int state)
