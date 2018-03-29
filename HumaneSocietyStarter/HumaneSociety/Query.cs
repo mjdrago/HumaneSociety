@@ -124,7 +124,15 @@ namespace HumaneSociety
 
         public static void UpdateClient(Client client)
         {
-            
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                Client clientToUpdate = context.Clients.Where(r => r.ID == client.ID).FirstOrDefault();
+                clientToUpdate.homeSize = client.homeSize;
+                clientToUpdate.kids = client.kids;
+                clientToUpdate.income = client.income;
+                clientToUpdate.pass = client.pass;
+                context.SubmitChanges();
+            }
         }
         public static void UpdateUsername(Client client)
         {
