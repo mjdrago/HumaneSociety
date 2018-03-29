@@ -89,7 +89,14 @@ namespace HumaneSociety
 
         public static void Adopt(Animal animal, Client client)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                ClientAnimalJunction submitAdoption = new ClientAnimalJunction();
+                submitAdoption.animal = animal.ID;
+                submitAdoption.client = client.ID;
+                context.ClientAnimalJunctions.InsertOnSubmit(submitAdoption);
+                context.SubmitChanges();
+            }
         }
 
         public static IQueryable<Client> RetrieveClients()
