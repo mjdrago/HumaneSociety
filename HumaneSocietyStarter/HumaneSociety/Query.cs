@@ -80,7 +80,11 @@ namespace HumaneSociety
 
         public static Animal GetAnimalByID(int ID)
         {
-            return GetAnimalByID(ID);
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var animal = context.Animals.Where(r => r.ID == ID).ToList();
+                return animal[0];
+            }
         }
 
         public static void Adopt(Animal animal, Client client)
