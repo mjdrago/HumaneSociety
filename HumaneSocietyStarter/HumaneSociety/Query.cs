@@ -192,12 +192,34 @@ namespace HumaneSociety
 
         public static List<AnimalShotJunction> GetShots(Animal animal)
         {
-            return GetShots(animal);
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var shotsGiven = context.AnimalShotJunctions.Where(r => r.Animal_ID == animal.ID).ToList();
+                return shotsGiven;
+            }
         }
 
         public static void UpdateShot(string input, Animal animal)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                int shotID = GetShotType(input);
+                AnimalShotJunction newShot = new AnimalShotJunction();
+                newShot.Animal_ID = animal.ID;
+                newShot.Shot_ID = shotID;
+                newShot.dateRecieved = DateTime.Now;
+                context.AnimalShotJunctions.InsertOnSubmit(newShot);
+                context.SubmitChanges();
+            }
+        }
+        private static int GetShotType(string shot)
+        {
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                
+                var shotWanted = context.Shots.Where(r => r.name == shot).ToList();
+                return shotWanted[0].ID;
+            }
         }
 
         public static void EnterUpdate(Animal animal, Dictionary<int, string> client) //not sure what identifier to use for Dictionary
