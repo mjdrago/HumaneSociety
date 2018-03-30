@@ -216,7 +216,6 @@ namespace HumaneSociety
         {
             using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
             {
-                
                 var shotWanted = context.Shots.Where(r => r.name == shot).ToList();
                 return shotWanted[0].ID;
             }
@@ -229,7 +228,11 @@ namespace HumaneSociety
 
         public static void RemoveAnimal(Animal animal)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                context.Animals.DeleteOnSubmit(animal);
+                context.SubmitChanges();
+            }
         }
         public static int GetBreed()
         {
