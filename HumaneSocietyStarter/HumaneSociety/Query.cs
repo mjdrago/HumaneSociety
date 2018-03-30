@@ -184,7 +184,9 @@ namespace HumaneSociety
         {
             using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
             {
-               
+                ClientAnimalJunction updateAdoptionStatus = context.ClientAnimalJunctions.Where(r => r.animal == clientAnimalJunction.animal && r.client == clientAnimalJunction.client).FirstOrDefault();
+                updateAdoptionStatus.approvalStatus = UserInterface.BoolToYesNo(value);
+                context.SubmitChanges();
             }
         }
 
