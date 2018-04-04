@@ -8,49 +8,64 @@ namespace HumaneSociety
 {
     public static class Query
     {
+        public delegate void CRUD(Employee employee);
         public static void RunEmployeeQueries(Employee employee, string type)
         {
-            Console.Clear();
-            UserInterface.DisplayUserOptions("Would you like to 1) create, 2) read, 3) update or 4) delete an employee?");
-            string input = UserInterface.GetUserInput();
-            switch (input)
+            CRUD crudOption;
+            if (type == "create")
             {
-                case "create":
-                    CreateEmployee();
-                    break;
-                case "read":
-                    ReadEmployee();
-                    break;
-                case "update":
-                    UpdateEmployee();
-                    break;
-                case "delete":
-                    DeleteEmployee();
-                    break;
-                default:
-                    UserInterface.DisplayUserOptions("Incorrect Input type please enter create, read, update or delete");
-                    RunEmployeeQueries(employee, type);
-                    break;
+                crudOption = CreateEmployee;
+            }
+            else if (type == "read")
+            {
+                crudOption = ReadEmployee;
+            }
+            else if (type == "update")
+            {
+                crudOption = UpdateEmployee;
+            }
+            else
+            {
+                crudOption = DeleteEmployee;
+            }
+            crudOption(employee);
+        }
+        private static void CreateEmployee(Employee employee)
+        {
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                context.Employees.InsertOnSubmit(employee);
+                context.SubmitChanges();
             }
         }
-        private static void CreateEmployee()
+        private static void ReadEmployee(Employee employee)
         {
-
+            List<string> info = new List<string>() { $"Employee Number: {employee.employeeNumber}", $"Last Name: {employee.lastName}", $"First Name: {employee.firsttName}", $"E-mail: {employee.email}" };
+            UserInterface.DisplayUserOptions(info);
+            Console.ReadLine();
         }
-        private static void ReadEmployee()
+        private static void UpdateEmployee(Employee employee)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var employeeToUpdate = context.Employees.Where(r => r.ID == employee.ID).FirstOrDefault();
+                employeeToUpdate.firsttName = employee.firsttName;
+                employeeToUpdate.lastName = employee.lastName;
+                employeeToUpdate.employeeNumber = employee.employeeNumber;
+                employeeToUpdate.email = employee.email;
+                context.SubmitChanges();
+            }
         }
-        private static void UpdateEmployee()
+
+        private static void DeleteEmployee(Employee employee)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                context.Employees.DeleteOnSubmit(employee);
+                context.SubmitChanges();
+            }
         }
- 
-        private static void DeleteEmployee()
-        {
 
-        }
-      
 
 
         public static Client GetClient(string userName, string password)
@@ -119,9 +134,46 @@ namespace HumaneSociety
 
         public static void AddNewClient(string firstName, string lastName, string userName, string password, string email, string streetAddress, int zipCode, int state)
         {
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                Client newClient = new Client();
+                newClient.firstName = firstName;
+                newClient.lastName = lastName;
+                newClient.userName = userName;
+                newClient.pass = password;
+                newClient.email = email;
+                newClient.userAddress = CreateAddressRecord(streetAddress, zipCode, state);
+                context.Clients.InsertOnSubmit(newClient);
+                context.SubmitChanges();
+            }
+        }
+        private static int CreateAddressRecord(string streetAddress, int zipCode, int state)
+        {
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                string address1 = default(string);
+                string address2 = default(string);
+                int maxLength = 50;
+                if (streetAddress.Length > maxLength)
+                {
+                    address1 = streetAddress.Substring(0, maxLength);
+                    address2 = streetAddress.Substring(maxLength, maxLength);
+                }
+                else
+                {
+                    address1 = streetAddress;
+                }
+                UserAddress newAddress = new UserAddress();
+                newAddress.addessLine1 = address1;
+                newAddress.addressLine2 = address2;
+                newAddress.zipcode = zipCode;
+                newAddress.USStates = state;
+                context.UserAddresses.InsertOnSubmit(newAddress);
+                context.SubmitChanges();
+                return newAddress.ID;
+            }
 
         }
-
         public static void UpdateClient(Client client)
         {
             using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
@@ -221,7 +273,7 @@ namespace HumaneSociety
             }
         }
 
-        public static void EnterUpdate(Animal animal, Dictionary<int, string> client) //not sure what identifier to use for Dictionary
+        public static void EnterUpdate(Animal animal, Dictionary<int, string> updates)
         {
 
         }
@@ -236,7 +288,83 @@ namespace HumaneSociety
         }
         public static int GetBreed()
         {
-            return GetBreed();
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                int categoryId = DetermineCategory();
+                int breedId = DeterminedBreedIndex(categoryId);
+                return breedId;
+            }
+        }
+
+        private static int DetermineCategory()
+        {
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                List<string> categoryTypeInfo = new List<string>();
+                var categories = context.Catagories.ToList();
+                int categoryCounter = 1;
+                int categoryOutput;
+                foreach (var category in categories)
+                {
+                    categoryTypeInfo.Add($"{categoryCounter}. {category.catagory1}");
+                }
+                UserInterface.DisplayUserOptions("Select type of animal: (Enter the number)");
+                UserInterface.DisplayUserOptions(categoryTypeInfo);
+                try
+                {
+                    int categoryIndex = int.Parse(UserInterface.GetUserInput());
+                    if (categoryIndex >= categoryTypeInfo.Count)
+                    {
+                        UserInterface.DisplayUserOptions("Not a valid category. Please try again.");
+                        categoryOutput = DetermineCategory();
+                    }
+                    else
+                    {
+                        categoryOutput = categories[categoryIndex - 1].ID;
+                    }
+                }
+                catch
+                {
+                    UserInterface.DisplayUserOptions("Input was not a valide number. Please enter a valide number.");
+                    categoryOutput = DetermineCategory();
+                }
+                return categoryOutput;
+            }
+        }
+        private static int DeterminedBreedIndex(int categoryIndex)
+        {
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                List<string> breedTypeInfo = new List<string>();
+                var breeds = context.Breeds.Where(r => r.catagory == categoryIndex).ToList();
+                int breedCounter = 1;
+                int breedOutput;
+                foreach (var breed in breeds)
+                {
+                    breedTypeInfo.Add($"{breedCounter}. {breed.breed1} with a {breed.pattern} pattern.");
+                }
+                UserInterface.DisplayUserOptions("Select the breed and pattern: (Enter the number)");
+                UserInterface.DisplayUserOptions(breedTypeInfo);
+                try
+                {
+                    int breedIndex = int.Parse(UserInterface.GetUserInput());
+                    if (categoryIndex >= breedTypeInfo.Count)
+                    {
+                        UserInterface.DisplayUserOptions("Not a valid category. Please try again.");
+                        breedOutput = DeterminedBreedIndex(categoryIndex);
+                    }
+                    else
+                    {
+                        breedOutput = breeds[breedIndex - 1].ID;
+                    }
+                }
+                catch
+                {
+                    UserInterface.DisplayUserOptions("Input was not a valide number. Please enter a valide number.");
+                    breedOutput = DeterminedBreedIndex(categoryIndex);
+                }
+                return breedOutput;
+            }
         }
         public static int GetDiet()
         {
@@ -248,24 +376,54 @@ namespace HumaneSociety
         }
         public static void AddAnimal(Animal animal)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                context.Animals.InsertOnSubmit(animal);
+                context.SubmitChanges();
+            }
         }
         public static Employee EmployeeLogin(string userName, string password)
         {
-            return EmployeeLogin(userName, password);
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var employee = context.Employees.Where(r => r.userName == userName && r.pass == password).ToList();
+                return employee[0];
+            }
         }
         public static Employee RetrieveEmployeeUser(string email, int employeeNumber)
         {
-            return RetrieveEmployeeUser(email, employeeNumber);
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var employee = context.Employees.Where(r => r.email == email && r.employeeNumber == employeeNumber).ToList();
+                return employee[0];
+            }
         }
         public static void AddUsernameAndPassword(Employee employee)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var newUser = context.Employees.Where(r => r.ID == employee.ID).FirstOrDefault();
+                newUser.userName = employee.userName;
+                newUser.pass = employee.pass;
+                context.SubmitChanges();
+            }
         }
         public static bool CheckEmployeeUserNameExist(string username)
         {
-            return CheckEmployeeUserNameExist(username);
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var employees = context.Employees;
+                foreach (var employee in employees)
+                {
+                    if (employee.userName == username)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
 
     }
+
 }
