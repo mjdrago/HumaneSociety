@@ -275,7 +275,47 @@ namespace HumaneSociety
 
         public static void EnterUpdate(Animal animal, Dictionary<int, string> updates)
         {
-
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                Animal animalToUpdate = context.Animals.Where(r => r.ID == animal.ID).FirstOrDefault();
+                foreach (KeyValuePair<int,string> update in updates)
+                {
+                    if (update.Key == 1)
+                    {
+                        var categories = context.Catagories.Where(r => r.catagory1 == update.Value).ToList();
+                        animalToUpdate.breed = DeterminedBreedIndex(categories[0].ID);
+                    }
+                    if (update.Key == 2)
+                    {
+                        var breeds = context.Breeds.Where(r => r.breed1 == update.Value).ToList();
+                        animalToUpdate.breed = breeds[0].ID;
+                    }
+                    if (update.Key == 3)
+                    {
+                        animalToUpdate.name = update.Value;
+                    }
+                    if (update.Key == 4)
+                    {
+                        animalToUpdate.age = int.Parse(update.Value);
+                    }
+                    if (update.Key == 5)
+                    {
+                        animalToUpdate.demeanor = update.Value;
+                    }
+                    if (update.Key == 6)
+                    {
+                        animalToUpdate.kidFriendly = UserInterface.BoolStringToBit(update.Value);
+                    }
+                    if (update.Key == 7)
+                    {
+                        animalToUpdate.petFriendly = UserInterface.BoolStringToBit(update.Value);
+                    }
+                    if (update.Key == 8)
+                    {
+                        animalToUpdate.weight = int.Parse(update.Value);
+                    }
+                }
+            }
         }
 
         public static void RemoveAnimal(Animal animal)
@@ -307,13 +347,14 @@ namespace HumaneSociety
                 foreach (var category in categories)
                 {
                     categoryTypeInfo.Add($"{categoryCounter}. {category.catagory1}");
+                    categoryCounter++;
                 }
                 UserInterface.DisplayUserOptions("Select type of animal: (Enter the number)");
                 UserInterface.DisplayUserOptions(categoryTypeInfo);
                 try
                 {
                     int categoryIndex = int.Parse(UserInterface.GetUserInput());
-                    if (categoryIndex >= categoryTypeInfo.Count)
+                    if (categoryIndex > categoryTypeInfo.Count)
                     {
                         UserInterface.DisplayUserOptions("Not a valid category. Please try again.");
                         categoryOutput = DetermineCategory();
@@ -342,13 +383,14 @@ namespace HumaneSociety
                 foreach (var breed in breeds)
                 {
                     breedTypeInfo.Add($"{breedCounter}. {breed.breed1} with a {breed.pattern} pattern.");
+                    breedCounter++;
                 }
                 UserInterface.DisplayUserOptions("Select the breed and pattern: (Enter the number)");
                 UserInterface.DisplayUserOptions(breedTypeInfo);
                 try
                 {
                     int breedIndex = int.Parse(UserInterface.GetUserInput());
-                    if (categoryIndex >= breedTypeInfo.Count)
+                    if (categoryIndex > breedTypeInfo.Count)
                     {
                         UserInterface.DisplayUserOptions("Not a valid category. Please try again.");
                         breedOutput = DeterminedBreedIndex(categoryIndex);
@@ -368,7 +410,79 @@ namespace HumaneSociety
         }
         public static int GetDiet()
         {
-            return GetDiet();
+            using (HumaneSocietyDataContext context = new HumaneSocietyDataContext())
+            {
+                var animalDiets = context.DietPlans;
+                var foodTypes = (from animalDiet in animalDiets select animalDiet.food).Distinct().ToList();
+                string desiredFood = DetermineFoodType(foodTypes);
+                var foodAmount = animalDiets.Where(r => r.food == desiredFood).ToList();
+                int dietIndex = DetermineAmount(foodAmount);
+                return dietIndex;
+            }
+        }
+        private static string DetermineFoodType(List<string> foodTypes)
+        {
+            List<string> displayFoodTypes = new List<string>();
+            int foodTypeCounter = 1;
+            string foodOutput;
+            foreach (var foodType in foodTypes)
+            {
+                displayFoodTypes.Add($"{foodTypeCounter}. {foodType}");
+                foodTypeCounter++;
+            }
+            UserInterface.DisplayUserOptions("Select the type of food need: (please enter the corresponding number)");
+            UserInterface.DisplayUserOptions(displayFoodTypes);
+            try
+            {
+                int desiredFood = int.Parse(UserInterface.GetUserInput());
+                if (desiredFood > foodTypes.Count)
+                {
+                    UserInterface.DisplayUserOptions("Not a valid food choice. Please try again.");
+                    foodOutput = DetermineFoodType(foodTypes);
+                }
+                else
+                {
+                    foodOutput = foodTypes[desiredFood - 1];
+                }
+            }
+            catch
+            {
+                UserInterface.DisplayUserOptions("Input was not a valid number. Please enter a valid number.");
+                foodOutput = DetermineFoodType(foodTypes);
+            }
+            return foodOutput;
+        }
+        private static int DetermineAmount(List<DietPlan> foodAmounts)
+        {
+            List<string> displayAmount = new List<string>();
+            int amountCounter = 1;
+            int amountOutput;
+            foreach (var foodAmount in foodAmounts)
+            {
+                displayAmount.Add($"{amountCounter}. {foodAmount.amount}");
+                amountCounter++;
+            }
+            UserInterface.DisplayUserOptions("Select the amount of food needed: (please enter the corresponding number)");
+            UserInterface.DisplayUserOptions(displayAmount);
+            try
+            {
+                int foodAmount = int.Parse(UserInterface.GetUserInput());
+                if (foodAmount > foodAmounts.Count)
+                {
+                    UserInterface.DisplayUserOptions("Not a valid food choice. Please try again.");
+                    amountOutput = DetermineAmount(foodAmounts);
+                }
+                else
+                {
+                    amountOutput = foodAmounts[foodAmount - 1].ID;
+                }
+            }
+            catch
+            {
+                UserInterface.DisplayUserOptions("Input was not a valid number. Please enter a valid number.");
+                amountOutput = DetermineAmount(foodAmounts);
+            }
+            return amountOutput;
         }
         public static int GetLocation()
         {

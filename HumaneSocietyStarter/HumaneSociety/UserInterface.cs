@@ -199,5 +199,16 @@ namespace HumaneSociety
                     return searchParameters;
             }
         }
+        public static bool BoolStringToBit(string boolString)
+        {
+            if (boolString == "true")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
